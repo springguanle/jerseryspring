@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 注册组件扫描器 -->
+	<context:component-scan base-package="com.wake.jerseryspring.resources" />
+	<context:component-scan base-package="com.wake.jerseryspring.service" />
+	
+	<!-- 加载属性配置文件 -->
+	<context:property-placeholder location="classpath*:jdbc.properties"/>
+	
+	<!-- 注册数据源，访问数据库：druid -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.passwd}" />
+	</bean>
+	
+	<!-- 注册SqlSessionFactoryBean，创建SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	    <!-- 数据源DataSource -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- sql映射文件的的位置 -->
+		<property name="mapperLocations" 
+			value="classpath*:com/wake/jerseryspring/mapper/*.xml" />
+		<!-- 指定别名 -->
+		<property name="typeAliasesPackage" value="com.wake.jerseryspring.beans" />
+	</bean>
+	
+	<!-- 注册MyBatis的扫描器，使用MyBatis的动态代理，创建Dao接口的实现类对象 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 指定SqlSesionFactory对象 -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		<!-- 指定Dao接口的包名 -->
+		<property name="basePackage" value="com.wake.jerseryspring.dao" />
+	</bean>
+</beans>
